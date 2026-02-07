@@ -1,0 +1,21 @@
+{
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "scarab-33958",
+                    "appId": "1:645542849552:android:57f416cbdc9578d1a46e95",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "scarab-33958",
+                    "configurations": {
+                        "android": "1:645542849552:android:57f416cbdc9578d1a46e95"
+                    }
+                }
+            }
+        }
+    }
+}
