@@ -1,6 +1,5 @@
-import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:flutter/material.dart';
-import 'package:scarab/models/app.dart';
+import 'package:scarab/models/device.dart';
 
 class AllowedAppsWrap extends StatelessWidget {
   const AllowedAppsWrap({super.key, required this.apps});
@@ -25,9 +24,6 @@ class AllowedAppsWrap extends StatelessWidget {
           .map(
             (app) => InkWell(
               borderRadius: BorderRadius.circular(14),
-              onTap: () async {
-                LaunchApp.openApp(androidPackageName: app.packageId);
-              },
               child: Ink(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,

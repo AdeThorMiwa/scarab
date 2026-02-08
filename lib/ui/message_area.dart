@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scarab/models/chat_message.dart';
-import '../scarab.dart';
+import 'state/scarab.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 class MessageArea extends ConsumerWidget {
@@ -69,7 +69,7 @@ class _MessageList extends StatelessWidget {
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       itemCount: messages.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final message = messages[messages.length - 1 - index];
         return _MessageBubble(

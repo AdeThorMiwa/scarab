@@ -3,8 +3,8 @@ import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:flutter_accessibility_service/flutter_accessibility_service.dart';
-import 'package:scarab/session/enforcement/action.dart';
-import 'package:scarab/session/session.dart';
+import 'package:scarab/services/enforcement/action.dart';
+import 'package:scarab/models/session.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'enforcer.dart';
 
@@ -68,7 +68,13 @@ class EnforcementService {
   }
 
   static Future<void> stopService() async {
-    await FlutterForegroundTask.stopService();
+    var result = await FlutterForegroundTask.stopService();
+    if (result is ServiceRequestFailure) {
+      print("Failed to stop service: ${result.error}");
+      return;
+    }
+
+    print("Service stopped successfully");
   }
 
   static Future<Session?> getActiveSession() async {
@@ -90,9 +96,6 @@ class EnforcementService {
   static Future<void> initialize({bool isBackground = false}) async {
     FlutterForegroundTask.initCommunicationPort();
     FlutterForegroundTask.addTaskDataCallback(_onReceiveTaskData);
-    if (!isBackground) {
-      await _requestPermissions();
-    }
   }
 
   static void _onReceiveTaskData(Object data) {
@@ -107,34 +110,10 @@ class EnforcementService {
     }
   }
 
-  static Future<void> _requestPermissions() async {
-    NotificationPermission notificationPermission =
-        await FlutterForegroundTask.checkNotificationPermission();
-    if (notificationPermission != NotificationPermission.granted) {
-      await FlutterForegroundTask.requestNotificationPermission();
-    }
-
-    if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
-      await FlutterForegroundTask.requestIgnoreBatteryOptimization();
-    }
-
-    if (!await FlutterForegroundTask.canScheduleExactAlarms) {
-      await FlutterForegroundTask.openAlarmsAndRemindersSettings();
-    }
-
-    if (!await FlutterForegroundTask.canDrawOverlays) {
-      await FlutterForegroundTask.openSystemAlertWindowSettings();
-    }
-
-    if (!(await FlutterAccessibilityService.isAccessibilityPermissionEnabled())) {
-      await FlutterAccessibilityService.requestAccessibilityPermission();
-    }
-  }
-
-  static void initService() {
+  static void initService(String serviceId) {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
-        channelId: 'scarab_sticky_alerts',
+        channelId: 'channel_$serviceId',
         channelName: 'Scarab Enforcement Service Notification',
         channelDescription:
             'This notification appears when an enforcement service running.',

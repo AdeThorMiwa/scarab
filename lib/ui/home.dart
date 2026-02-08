@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scarab/ui/chat_input.dart';
 import 'package:scarab/ui/daily_sessions.dart';
 import 'package:scarab/ui/message_area.dart';
-import '../scarab.dart';
+import 'state/scarab.dart';
 
 class LauncherHome extends ConsumerStatefulWidget {
   const LauncherHome({super.key});
@@ -13,41 +13,12 @@ class LauncherHome extends ConsumerStatefulWidget {
 }
 
 class LauncherHomeState extends ConsumerState<LauncherHome> {
-  late PageController _pageController;
-  late FocusNode _chatFocusNode;
   late TextEditingController _inputController;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
-    _chatFocusNode = FocusNode();
     _inputController = TextEditingController();
-
-    _chatFocusNode.addListener(() {
-      if (_chatFocusNode.hasFocus) {
-        _showMessages();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _chatFocusNode.dispose();
-    super.dispose();
-  }
-
-  void _showMessages() {
-    if (!_pageController.hasClients) {
-      return;
-    }
-
-    _pageController.animateToPage(
-      1,
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.easeOut,
-    );
   }
 
   void _handleSubmitted(String value) {
@@ -71,17 +42,14 @@ class LauncherHomeState extends ConsumerState<LauncherHome> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               DailySessions(),
-              const SizedBox(height: 12),
               Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  children: [MessageArea()],
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16, bottom: 16),
+                  child: MessageArea(),
                 ),
               ),
-              const SizedBox(height: 16),
               ChatInput(
                 controller: _inputController,
-                focusNode: _chatFocusNode,
                 onSubmitted: _handleSubmitted,
               ),
             ],

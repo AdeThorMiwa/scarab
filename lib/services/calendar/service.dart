@@ -1,8 +1,8 @@
-import 'package:scarab/calendar/event.dart';
-import 'package:scarab/calendar/repository/base.dart';
-import 'package:scarab/calendar/repository/google_calendar.dart';
+import 'package:scarab/services/calendar/event.dart';
+import 'package:scarab/services/calendar/repository/base.dart';
+import 'package:scarab/services/calendar/repository/google_calendar.dart';
 import 'package:scarab/models/calendar.dart';
-import 'package:scarab/services/device.dart';
+import 'package:scarab/services/launcher.dart';
 import 'package:collection/collection.dart';
 import 'package:scarab/utils/id.dart';
 
@@ -14,9 +14,7 @@ class CalendarService {
     AddEventToCalendarRequest req, {
     String calendarId = "default",
   }) async {
-    var deviceApps = await DeviceService.getInstalledApps();
-
-    print("got here too");
+    var deviceApps = await LauncherService.getDeviceApps();
 
     for (final packageId in req.allowedApps) {
       var match = deviceApps.firstWhereOrNull(
@@ -28,16 +26,10 @@ class CalendarService {
       }
     }
 
-    print("got here");
-
     var overlappingEvents = await _repository.getEvents(
       calendarId: calendarId,
       from: req.startTime,
       to: req.endTime,
-    );
-
-    print(
-      "overlapping events: ${overlappingEvents.map((e) => e.toMap()).toList()}",
     );
 
     if (overlappingEvents.isNotEmpty) {
@@ -45,8 +37,6 @@ class CalendarService {
     }
 
     var id = generateHexString();
-
-    print("Creating calendar event with id: $id");
 
     CalendarEvent evt = CalendarEvent(
       id,

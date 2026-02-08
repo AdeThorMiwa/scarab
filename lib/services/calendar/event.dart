@@ -56,4 +56,16 @@ class CalendarEvent {
       'isFreeTime': isFreeTime,
     };
   }
+
+  factory CalendarEvent.fromMap(Map<String, dynamic> map) {
+    return CalendarEvent(
+      map['id'] as String,
+      title: map['title'] as String,
+      description: map['description'] as String,
+      startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime'] as int),
+      endTime: DateTime.fromMillisecondsSinceEpoch(map['endTime'] as int),
+      allowedApps: List<String>.from(map['allowedApps'] as List<dynamic>),
+      isFreeTime: map['isFreeTime'] as bool,
+    );
+  }
 }

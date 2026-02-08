@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:scarab/models/app.dart';
-import 'package:scarab/scarab.dart';
-import 'package:scarab/session/session.dart';
+import 'package:scarab/models/device.dart';
+import 'package:scarab/ui/state/scarab.dart';
+import 'package:scarab/models/session.dart';
 import 'package:scarab/ui/allowed_apps.dart';
 
 class SessionCard extends ConsumerWidget {
@@ -31,7 +31,11 @@ class SessionCard extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF1E2227)),
+        border: Border.all(
+          color: isActive
+              ? Theme.of(context).colorScheme.primary
+              : const Color(0xFF1E2227),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,15 +60,7 @@ class SessionCard extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          if (isActive)
-            AllowedAppsWrap(apps: allowedApps)
-          else
-            Text(
-              'Break time: all apps allowed.',
-              style: textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF8A8F98),
-              ),
-            ),
+          AllowedAppsWrap(apps: allowedApps),
         ],
       ),
     );
@@ -74,7 +70,7 @@ class SessionCard extends ConsumerWidget {
     if (isActive) {
       return 'Locked: Active session';
     }
-    return 'Break: Go catch your breath';
+    return 'Coming next';
   }
 
   String _timeRangeLabel(Session session) {

@@ -1,4 +1,4 @@
-import 'package:scarab/calendar/event.dart';
+import 'package:scarab/services/calendar/event.dart';
 
 abstract class CalendarEventRepository {
   String get id;

@@ -1,16 +1,23 @@
 import 'dart:ui';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:scarab/session/enforcement/service.dart';
-import 'package:scarab/session/reminder.dart';
-import 'package:scarab/session/session.dart';
+import 'package:scarab/services/enforcement/service.dart';
+import 'package:scarab/services/reminder.dart';
+import 'package:scarab/models/session.dart';
 
 @pragma('vm:entry-point')
 void beginSession(int id, Map<String, dynamic> map) async {
   DartPluginRegistrant.ensureInitialized();
-  EnforcementService.initService();
-
   var session = Session.fromMap(map);
+  EnforcementService.initService(session.id);
   await EnforcementService.startService(session);
+}
+
+@pragma('vm:entry-point')
+void endSession(int id, Map<String, dynamic> map) async {
+  DartPluginRegistrant.ensureInitialized();
+  var session = Session.fromMap(map);
+  EnforcementService.initService(session.id);
+  await SessionService.killSession(session);
 }
 
 class SessionService {
@@ -23,10 +30,19 @@ class SessionService {
     await _scheduleSession(session);
   }
 
-  static Future<void> stopSession(Session session) async {
+  static Future<void> killSession(Session session) async {
     await AndroidAlarmManager.cancel(session.id.hashCode);
     await ReminderService.cancelSessionPendingReminders(session);
     await EnforcementService.stopService();
+  }
+
+  static Future<void> stopSession(Session session) async {
+    AndroidAlarmManager.oneShotAt(
+      session.end.subtract(Duration(seconds: 10)),
+      session.id.hashCode + 1,
+      endSession,
+      alarmClock: true,
+    );
   }
 
   static Future<R> sendMessageToSession<R>(

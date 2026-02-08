@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:scarab/alarm/config.dart';
+import 'package:scarab/services/alarm/config.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:vibration/vibration.dart';

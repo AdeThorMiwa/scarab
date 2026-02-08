@@ -1,15 +1,15 @@
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:flutter/services.dart';
 import 'package:flutter_accessibility_service/accessibility_event.dart';
 import 'package:flutter_accessibility_service/constants.dart';
 import 'package:flutter_accessibility_service/flutter_accessibility_service.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:scarab/calendar/service.dart';
+import 'package:scarab/services/calendar/service.dart';
 import 'package:scarab/models/calendar.dart';
-import 'package:scarab/session/alarm.dart';
-import 'package:scarab/session/enforcement/action.dart';
-import 'package:scarab/session/session.dart';
+import 'package:scarab/services/alarm/service.dart';
+import 'package:scarab/services/enforcement/action.dart';
+import 'package:scarab/models/session.dart';
+import 'package:scarab/services/launcher.dart';
 
 class NoSessionException implements Exception {}
 
@@ -20,7 +20,6 @@ void startCallback() {
 
 class SessionEnforcer extends TaskHandler {
   static final String sessionStorageKey = "active_session";
-  static final String scarabPackageName = "com.example.scarab";
 
   Future<Session> get _session async {
     final json = await FlutterForegroundTask.getData<String>(
@@ -41,7 +40,7 @@ class SessionEnforcer extends TaskHandler {
       return false;
     }
 
-    if (packageName == scarabPackageName) {
+    if (packageName == await LauncherService.getPackageName()) {
       return false;
     }
 
@@ -57,19 +56,13 @@ class SessionEnforcer extends TaskHandler {
     print("[SessionEnforcer::onStart]");
 
     // ring the alarm like vietnam in this B!
-    await AlarmService.ring();
+    // await AlarmService.ring();
     _setupAccessibilityListener();
   }
 
   // Called based on the eventAction set in ForegroundTaskOptions.
   @override
-  void onRepeatEvent(DateTime timestamp) {
-    // Send data to main isolate.
-    final Map<String, dynamic> data = {
-      "timestampMillis": timestamp.millisecondsSinceEpoch,
-    };
-    FlutterForegroundTask.sendDataToMain(data);
-  }
+  void onRepeatEvent(DateTime timestamp) {}
 
   // Called when the task is destroyed.
   @override
@@ -151,11 +144,11 @@ class SessionEnforcer extends TaskHandler {
         "[SessionEnforcer::accessibility] new event for package: ${event.packageName}",
       );
 
-      if (isOverlayDisplay(event)) {
+      if (await isOverlayDisplay(event)) {
         return;
       }
 
-      if (await isCurrentImePackage(event)) {
+      if (isCurrentImePackage(event)) {
         return;
       }
 
@@ -174,8 +167,8 @@ class SessionEnforcer extends TaskHandler {
     });
   }
 
-  bool isOverlayDisplay(AccessibilityEvent event) {
-    return event.packageName == scarabPackageName &&
+  Future<bool> isOverlayDisplay(AccessibilityEvent event) async {
+    return event.packageName == await LauncherService.getPackageName() &&
         event.windowType == WindowType.typeAccessibilityOverlay;
   }
 
@@ -183,26 +176,7 @@ class SessionEnforcer extends TaskHandler {
     return event.packageName == "com.android.systemui";
   }
 
-  Future<bool> isCurrentImePackage(AccessibilityEvent event) async {
-    try {
-      // You'll need a tiny MethodChannel or a plugin that reads Secure Settings
-      // If you don't have one, 'native_settings' is a good choice.
-      var platform = MethodChannel('$scarabPackageName/settings');
-      final String? ime = await platform.invokeMethod(
-        'getSecureSetting',
-        'default_input_method',
-      );
-
-      print("ime: $ime");
-
-      // Equivalent of substringBefore('/')
-      var imePackage = ime?.split('/').first;
-
-      return event.packageName == imePackage;
-    } catch (e) {
-      print("error checking IME package: $e");
-
-      return event.packageName?.contains("android.inputmethod") ?? false;
-    }
+  bool isCurrentImePackage(AccessibilityEvent event) {
+    return event.packageName?.contains("android.inputmethod") ?? false;
   }
 }

@@ -1,4 +1,4 @@
-import 'package:scarab/session/session.dart';
+import 'package:scarab/models/session.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -11,9 +11,6 @@ class ReminderService {
   static Future<void> initialize({bool isBackground = false}) async {
     await _configureLocalTimeZone();
     await _initializeNotificationPlugin();
-    if (!isBackground) {
-      await _requestPermissions();
-    }
   }
 
   static Future<void> setSessionReminders(Session session) async {
@@ -110,18 +107,5 @@ class ReminderService {
         InitializationSettings(android: initializationSettingsAndroid);
 
     await _plugin.initialize(settings: initializationSettings);
-  }
-
-  static Future<void> _requestPermissions() async {
-    var androidImpl = _plugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >();
-    await androidImpl?.requestNotificationsPermission();
-    await androidImpl?.requestExactAlarmsPermission();
-    await androidImpl?.requestExactAlarmsPermission();
-    await androidImpl?.requestNotificationPolicyAccess();
-
-    print("notification permissions requested");
   }
 }

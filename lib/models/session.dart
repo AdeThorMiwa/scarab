@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:firebase_ai/firebase_ai.dart';
-import 'package:scarab/calendar/event.dart';
+import 'package:scarab/services/calendar/event.dart';
 
 class Session {
   final String id;
@@ -9,7 +9,7 @@ class Session {
   final List<String> allowedApps;
   final DateTime start;
   final DateTime end;
-  final List<int> reminderOffsets = [1];
+  final List<int> reminderOffsets = [30, 10];
   final List<Content> llmChatHistory;
 
   Session(
@@ -62,5 +62,4 @@ class Session {
       llmChatHistory: [],
     );
   }
-
 }

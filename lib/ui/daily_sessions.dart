@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:scarab/scarab.dart';
-import 'package:scarab/session/session.dart';
+import 'package:scarab/ui/state/scarab.dart';
+import 'package:scarab/models/session.dart';
 import 'package:scarab/ui/cards/status_card.dart';
 
 class DailySessions extends ConsumerStatefulWidget {
@@ -35,6 +35,10 @@ class DailySessionsState extends ConsumerState<DailySessions> {
 
     var upcomingSessions = ref.watch(upcomingSessionsProvider);
 
+    if (upcomingSessions.isEmpty) {
+      return const Text("Free for the rest of the day");
+    }
+
     return SizedBox(
       // PageView needs a height constraint in a Column/Expanded
       height: 180,
@@ -43,14 +47,13 @@ class DailySessionsState extends ConsumerState<DailySessions> {
         controller: _pageController,
         padEnds: false,
         children: [
-          if (activeSession != null)
-            _buildCarouselItem(
-              SessionCard(session: activeSession, isActive: true),
-            ),
           if (upcomingSessions.isNotEmpty)
             ...upcomingSessions.map(
               (session) => _buildCarouselItem(
-                SessionCard(session: session, isActive: false),
+                SessionCard(
+                  session: session,
+                  isActive: activeSession?.id == session.id,
+                ),
               ),
             ),
         ],

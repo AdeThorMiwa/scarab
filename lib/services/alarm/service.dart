@@ -1,5 +1,5 @@
-import 'package:scarab/alarm/config.dart';
-import 'package:scarab/alarm/controller.dart';
+import 'package:scarab/services/alarm/config.dart';
+import 'package:scarab/services/alarm/controller.dart';
 
 class AlarmService {
   static Future<void> ring() async {

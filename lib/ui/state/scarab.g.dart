@@ -12,7 +12,7 @@ part of 'scarab.dart';
 @ProviderFor(Scarab)
 final scarabProvider = ScarabProvider._();
 
-final class ScarabProvider extends $NotifierProvider<Scarab, ScarabState> {
+final class ScarabProvider extends $NotifierProvider<Scarab, AppState> {
   ScarabProvider._()
     : super(
         from: null,
@@ -32,27 +32,27 @@ final class ScarabProvider extends $NotifierProvider<Scarab, ScarabState> {
   Scarab create() => Scarab();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ScarabState value) {
+  Override overrideWithValue(AppState value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ScarabState>(value),
+      providerOverride: $SyncValueProvider<AppState>(value),
     );
   }
 }
 
-String _$scarabHash() => r'7dff6958d5c54114d1a2b4ec30f30cc5d74ee2b0';
+String _$scarabHash() => r'0e5eeb89a239d3f965fd55fd38d99971b098b03b';
 
-abstract class _$Scarab extends $Notifier<ScarabState> {
-  ScarabState build();
+abstract class _$Scarab extends $Notifier<AppState> {
+  AppState build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<ScarabState, ScarabState>;
+    final ref = this.ref as $Ref<AppState, AppState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ScarabState, ScarabState>,
-              ScarabState,
+              AnyNotifier<AppState, AppState>,
+              AppState,
               Object?,
               Object?
             >;

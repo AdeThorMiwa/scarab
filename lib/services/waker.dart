@@ -2,28 +2,32 @@ import 'dart:ui';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:scarab/engine.dart';
+import 'package:scarab/services/backend.dart';
 
 @pragma('vm:entry-point')
 void wakerCallback() async {
   await dotenv.load();
   DartPluginRegistrant.ensureInitialized();
-  await ScarabEngine.initialize(isBackground: true);
-  await ScarabEngine.run();
+  await ScarabBackendService.initialize(isBackground: true);
+  await ScarabBackendService.run();
 }
 
-class ScarabWaker {
+class WakerService {
   static const int _wakerAlarmId = 888; // Unique ID for the waker
-  static const Duration _defaultInterval = Duration(minutes: 50, seconds: 10);
+  static const Duration _defaultDelay = Duration(minutes: 50, seconds: 10);
 
-  /// Starts or Resets the waker.
-  /// If called while a timer is running, it cancels the old one and starts fresh.
-  static Future<void> poke({Duration? duration}) async {
-    final interval = duration ?? _defaultInterval;
+  static Future<void> wake({Duration? delayUntil, DateTime? datetime}) async {
+    var delay = delayUntil;
+
+    if (delay == null && datetime != null) {
+      delay = datetime.difference(DateTime.now());
+    }
+
+    delay ??= _defaultDelay;
 
     // By using the same ID, Android replaces any existing pending alarm
     await AndroidAlarmManager.oneShot(
-      interval,
+      delay,
       _wakerAlarmId,
       wakerCallback,
       exact: true,
@@ -32,7 +36,7 @@ class ScarabWaker {
     );
 
     print(
-      "ScarabWaker: Engine scheduled to wake in ${interval.inMinutes} minutes.",
+      "ScarabWaker: Engine scheduled to wake in ${delay.inMinutes} minutes.",
     );
   }
 
@@ -40,7 +44,7 @@ class ScarabWaker {
     var now = DateTime.now();
     var nextDay = DateTime(now.year, now.month, now.day + 1);
     var durationUntilNextDay = nextDay.difference(now);
-    await poke(duration: durationUntilNextDay);
+    await wake(delayUntil: durationUntilNextDay);
   }
 
   static Future<void> sleep() async {

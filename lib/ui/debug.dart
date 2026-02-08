@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_accessibility_service/flutter_accessibility_service.dart';
-import 'package:scarab/calendar/event.dart';
-import 'package:scarab/session/alarm.dart';
-import 'package:scarab/session/manager.dart';
-import 'package:scarab/session/session.dart';
+import 'package:scarab/services/calendar/event.dart';
+import 'package:scarab/services/alarm/service.dart';
+import 'package:scarab/services/session.dart';
+import 'package:scarab/models/session.dart';
 
 class DebugScreen extends StatelessWidget {
   DebugScreen({super.key});
@@ -29,7 +29,7 @@ class DebugScreen extends StatelessWidget {
   }
 
   void handleStopSession() async {
-    await SessionService.stopSession(session);
+    await SessionService.killSession(session);
   }
 
   void ringAlarm() async {
