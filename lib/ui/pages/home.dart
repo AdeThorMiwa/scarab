@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scarab/ui/chat_input.dart';
 import 'package:scarab/ui/daily_sessions.dart';
 import 'package:scarab/ui/message_area.dart';
-import 'state/scarab.dart';
+import '../state/scarab.dart';
 
 class LauncherHome extends ConsumerStatefulWidget {
   const LauncherHome({super.key});
@@ -35,25 +35,35 @@ class LauncherHomeState extends ConsumerState<LauncherHome>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DailySessions(),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 16),
-                  child: MessageArea(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+
+        if (_inputController.text.isNotEmpty) {
+          _inputController.clear();
+        }
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DailySessions(),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16, bottom: 16),
+                    child: MessageArea(),
+                  ),
                 ),
-              ),
-              ChatInput(
-                controller: _inputController,
-                onSubmitted: _handleSubmitted,
-              ),
-            ],
+                ChatInput(
+                  controller: _inputController,
+                  onSubmitted: _handleSubmitted,
+                ),
+              ],
+            ),
           ),
         ),
       ),

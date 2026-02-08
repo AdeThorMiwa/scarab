@@ -2,7 +2,9 @@ import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scarab/models/device.dart';
+import 'package:scarab/models/route.dart';
 import 'package:scarab/ui/state/scarab.dart';
+import 'package:scarab/utils/consts.dart';
 
 class ChatInput extends ConsumerStatefulWidget {
   final TextEditingController controller;
@@ -22,6 +24,7 @@ class ChatInputState extends ConsumerState<ChatInput> {
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
   bool _isShowingSuggestions = false;
+  List<Suggestion> _selectedSuggestion = [];
   List<Suggestion> _filteredSuggestions = [];
 
   @override
@@ -69,6 +72,10 @@ class ChatInputState extends ConsumerState<ChatInput> {
   }
 
   List<Suggestion> _buildFullSuggestionList() {
+    List<Suggestion> suggestions = [AllSuggestions()];
+
+    suggestions.addAll(appRoutes.map((route) => NavigationSuggestion(route)));
+
     // ref.read is used here because this is an event handler/helper
     final deviceApps = ref
         .read(deviceAppsProvider)
@@ -86,7 +93,9 @@ class ChatInputState extends ConsumerState<ChatInput> {
             .toList() ??
         deviceApps.values.toList();
 
-    return [AllSuggestions(), ...allowedApps.map((app) => AppSuggestion(app))];
+    suggestions.addAll(allowedApps.map((app) => AppSuggestion(app)));
+
+    return suggestions;
   }
 
   void _showSuggestions() {
@@ -181,6 +190,10 @@ class ChatInputState extends ConsumerState<ChatInput> {
           ),
         );
 
+        setState(() {
+          _selectedSuggestion = [..._selectedSuggestion, suggestion];
+        });
+
         _hideSuggestions();
       },
     );
@@ -194,27 +207,23 @@ class ChatInputState extends ConsumerState<ChatInput> {
   }
 
   void onSubmit(String text) {
-    final trimmedText = text.trim();
+    var trimmedText = text.trim();
     if (trimmedText.isEmpty) return;
 
-    final matches = _filteredSuggestions.where(
-      (s) => trimmedText.contains(s.activationKey()),
-    );
+    if (_selectedSuggestion.isNotEmpty) {
+      for (var suggestion in _selectedSuggestion) {
+        trimmedText = trimmedText.replaceFirst(suggestion.activationKey(), "");
+        suggestion.onSelect(context);
+      }
+    }
 
-    final bestMatch = matches.isEmpty
-        ? null
-        : matches.reduce(
-            (a, b) =>
-                a.activationKey().length > b.activationKey().length ? a : b,
-          );
-
-    // 3. Execute action
-    if (bestMatch != null) {
-      bestMatch.onSelect();
-    } else {
+    if (trimmedText.trim().isNotEmpty) {
       widget.onSubmitted(trimmedText);
     }
 
+    setState(() {
+      _selectedSuggestion = [];
+    });
     widget.controller.clear();
     _hideSuggestions();
   }
@@ -254,7 +263,7 @@ abstract class Suggestion {
 
   Suggestion(this.id, this.title, this.subText);
 
-  void onSelect();
+  void onSelect(BuildContext ctx);
 
   bool matches(String text) {
     return title.toLowerCase().contains(text.toLowerCase()) ||
@@ -271,7 +280,7 @@ class AppSuggestion extends Suggestion {
   AppSuggestion(this.app) : super(app.packageId, app.name, app.packageId);
 
   @override
-  void onSelect() {
+  void onSelect(BuildContext _) {
     LaunchApp.openApp(androidPackageName: app.packageId);
   }
 
@@ -283,7 +292,22 @@ class AllSuggestions extends Suggestion {
   AllSuggestions() : super('all_suggestions', 'All Suggestions', '');
 
   @override
-  void onSelect() {
+  void onSelect(BuildContext _) {
     // Do nothing
   }
+}
+
+class NavigationSuggestion extends Suggestion {
+  AppRoute route;
+
+  NavigationSuggestion(this.route)
+    : super(route.path, route.name, route.description);
+
+  @override
+  void onSelect(BuildContext context) {
+    Navigator.pushNamed(context, route.path);
+  }
+
+  @override
+  String activationKey() => ":goto:${route.path}";
 }

@@ -45,7 +45,6 @@ class CalendarService {
       startTime: req.startTime,
       endTime: req.endTime,
       allowedApps: req.allowedApps,
-      isFreeTime: req.isFreeTime,
     );
 
     await _repository.save(evt, calendarId: calendarId);

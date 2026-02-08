@@ -43,7 +43,6 @@ class CreateFocusSessionTool extends Tool {
       allowedApps: List<String>.from(
         (args["allowedApps"] as List<dynamic>?) ?? [],
       ),
-      isFreeTime: args["isFreeTime"] as bool? ?? false,
     );
 
     print("Creating event with request: $req");

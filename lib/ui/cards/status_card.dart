@@ -59,8 +59,8 @@ class SessionCard extends ConsumerWidget {
               color: const Color(0xFFB0B4BA),
             ),
           ),
-          const SizedBox(height: 16),
-          AllowedAppsWrap(apps: allowedApps),
+          const SizedBox(height: 8),
+          AllowedAppsWrap(appCount: allowedApps.length),
         ],
       ),
     );

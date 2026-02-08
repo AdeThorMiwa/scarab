@@ -1,7 +1,6 @@
 class AddEventToCalendarRequest {
   final String title;
   final String description;
-  final bool isFreeTime;
   final DateTime startTime;
   final DateTime endTime;
   final List<String> allowedApps;
@@ -12,7 +11,6 @@ class AddEventToCalendarRequest {
     required this.startTime,
     required this.endTime,
     required this.allowedApps,
-    this.isFreeTime = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -22,7 +20,6 @@ class AddEventToCalendarRequest {
       'startTime': startTime.millisecondsSinceEpoch,
       'endTime': endTime.millisecondsSinceEpoch,
       'allowedApps': allowedApps,
-      'isFreeTime': isFreeTime,
     };
   }
 }

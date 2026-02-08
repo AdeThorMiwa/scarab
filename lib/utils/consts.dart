@@ -1,3 +1,5 @@
+import 'package:scarab/models/route.dart';
+
 const String calendarId =
     "cfa7a1d329fea9ad82f34fc279e8c3cbac3157bda42cf998c22d6e3c58fb103c@group.calendar.google.com";
 
@@ -31,3 +33,11 @@ DO NOT guess app id, if the app the user want is not in list, let them know you 
 
 If a tool call is required, explain briefly what you are doing (e.g., "I'm locking Instagram for the next hour. Focus well.")
   """;
+
+const List<AppRoute> appRoutes = [
+  AppRoute(
+    "Create session",
+    "create a new calendar session",
+    "/create-session",
+  ),
+];

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:scarab/lock.dart';
+import 'package:scarab/ui/pages/lock.dart';
 import 'package:scarab/theme.dart';
 import 'package:scarab/ui/debug.dart';
-import 'package:scarab/ui/home.dart';
+import 'package:scarab/ui/pages/home.dart';
 import 'package:is_lock_screen2/is_lock_screen2.dart';
+import 'package:scarab/ui/pages/session.dart';
 
 class ScarabApp extends ConsumerStatefulWidget {
   const ScarabApp({super.key});
@@ -58,8 +59,12 @@ class ScarabAppState extends ConsumerState<ScarabApp>
     return MaterialApp(
       title: 'Scarab',
       theme: scarabTheme,
-      home: LauncherHome(),
+      initialRoute: "/",
       debugShowCheckedModeBanner: false,
+      routes: {
+        "/": (ctx) => const LauncherHome(),
+        "/create-session": (ctx) => CreateSessionPage(),
+      },
     );
   }
 }

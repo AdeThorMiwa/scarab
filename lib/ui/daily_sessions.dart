@@ -41,7 +41,7 @@ class DailySessionsState extends ConsumerState<DailySessions> {
 
     return SizedBox(
       // PageView needs a height constraint in a Column/Expanded
-      height: 180,
+      height: 150,
       width: double.infinity,
       child: PageView(
         controller: _pageController,

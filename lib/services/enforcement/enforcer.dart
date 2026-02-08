@@ -66,7 +66,9 @@ class SessionEnforcer extends TaskHandler {
 
   // Called based on the eventAction set in ForegroundTaskOptions.
   @override
-  void onRepeatEvent(DateTime timestamp) {}
+  void onRepeatEvent(DateTime timestamp) {
+    print('[SessionEnforcer::onRepeat] timestamp: $timestamp');
+  }
 
   // Called when the task is destroyed.
   @override
@@ -125,7 +127,6 @@ class SessionEnforcer extends TaskHandler {
         startTime: DateTime.fromMillisecondsSinceEpoch(input["startTime"]),
         endTime: DateTime.fromMillisecondsSinceEpoch(input["endTime"]),
         allowedApps: List<String>.from(input["allowedApps"] ?? []),
-        isFreeTime: input["isFreeTime"],
       );
 
       await CalendarService.addEventToCalendar(req);
