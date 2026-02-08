@@ -38,7 +38,7 @@ class ScarabBackendService {
     await _prepareNextSession(events.first);
 
     AppEventBus.publish(UpcomingEventsSyncEvent(events));
-    if (events.lastOrNull != null) {
+    if (events.length == 2) {
       await _scheduleWake(events.last);
     } else {
       await WakerService.scheduleNextDayWake();

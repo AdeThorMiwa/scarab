@@ -12,7 +12,8 @@ class LauncherHome extends ConsumerStatefulWidget {
   LauncherHomeState createState() => LauncherHomeState();
 }
 
-class LauncherHomeState extends ConsumerState<LauncherHome> {
+class LauncherHomeState extends ConsumerState<LauncherHome>
+    with WidgetsBindingObserver {
   late TextEditingController _inputController;
 
   @override
