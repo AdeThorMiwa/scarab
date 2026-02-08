@@ -4,12 +4,14 @@ import 'package:flutter_accessibility_service/accessibility_event.dart';
 import 'package:flutter_accessibility_service/constants.dart';
 import 'package:flutter_accessibility_service/flutter_accessibility_service.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:scarab/events/event.dart';
 import 'package:scarab/services/calendar/service.dart';
 import 'package:scarab/models/calendar.dart';
 import 'package:scarab/services/alarm/service.dart';
 import 'package:scarab/services/enforcement/action.dart';
 import 'package:scarab/models/session.dart';
 import 'package:scarab/services/launcher.dart';
+import 'package:scarab/events/bus.dart';
 
 class NoSessionException implements Exception {}
 
@@ -54,10 +56,12 @@ class SessionEnforcer extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     print("[SessionEnforcer::onStart]");
+    var session = await _session;
 
     // ring the alarm like vietnam in this B!
     // await AlarmService.ring();
     _setupAccessibilityListener();
+    AppEventBus.publish(SessionStartedEvent(session));
   }
 
   // Called based on the eventAction set in ForegroundTaskOptions.
@@ -69,6 +73,8 @@ class SessionEnforcer extends TaskHandler {
   Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {
     print('[SessionEnforcer::onDestroy] (isTimeout: $isTimeout)');
     await AlarmService.stop();
+    var session = await _session;
+    AppEventBus.publish(SessionEndedEvent(session));
   }
 
   // Called when the notification button is pressed.

@@ -35,18 +35,29 @@ class ScarabBackendService {
       return;
     }
 
-    var activeSession = await SessionService.getActiveSession();
-
-    if (activeSession == null) {
-      await _prepareNextSession(events.first);
-    }
+    await _prepareNextSession(events.first);
 
     AppEventBus.publish(UpcomingEventsSyncEvent(events));
+    if (events.lastOrNull != null) {
+      await _scheduleWake(events.last);
+    } else {
+      await WakerService.scheduleNextDayWake();
+    }
   }
 
   static Future<void> _prepareNextSession(CalendarEvent event) async {
     var session = Session.fromCalendarEvent(event);
     await SessionService.startSession(session);
-    WakerService.wake(datetime: session.end.subtract(Duration(minutes: 5)));
+    await SessionService.scheduleSessionStop(session);
+  }
+
+  // wake 1 minute before the first reminder offset, so we can setup events
+  static Future<void> _scheduleWake(CalendarEvent event) async {
+    var session = Session.fromCalendarEvent(event);
+    var firstReminder = session.reminderOffsets.reduce(
+      (value, offset) => offset > value ? value : offset,
+    );
+    var wakeTime = session.start.subtract(Duration(minutes: firstReminder - 1));
+    WakerService.wake(datetime: wakeTime);
   }
 }

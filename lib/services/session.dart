@@ -36,12 +36,13 @@ class SessionService {
     await EnforcementService.stopService();
   }
 
-  static Future<void> stopSession(Session session) async {
+  static Future<void> scheduleSessionStop(Session session) async {
     AndroidAlarmManager.oneShotAt(
-      session.end.subtract(Duration(seconds: 10)),
-      session.id.hashCode + 1,
+      session.end.subtract(Duration(seconds: 20)),
+      session.id.hashCode + 100,
       endSession,
       alarmClock: true,
+      params: session.toMap(),
     );
   }
 

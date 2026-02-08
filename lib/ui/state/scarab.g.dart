@@ -40,7 +40,7 @@ final class ScarabProvider extends $NotifierProvider<Scarab, AppState> {
   }
 }
 
-String _$scarabHash() => r'0e5eeb89a239d3f965fd55fd38d99971b098b03b';
+String _$scarabHash() => r'9d26fe8fefb4e45dcde87af8a4569a601d62dcb0';
 
 abstract class _$Scarab extends $Notifier<AppState> {
   AppState build();

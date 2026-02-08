@@ -9,7 +9,6 @@ import 'package:scarab/models/app.dart';
 import 'package:scarab/models/device.dart';
 import 'package:scarab/models/chat_message.dart';
 import 'package:scarab/services/launcher.dart';
-import 'package:scarab/services/session.dart';
 import 'package:scarab/models/session.dart';
 import 'package:scarab/ui/state/tools/repository.dart';
 import '../../utils/consts.dart';
@@ -55,6 +54,17 @@ class Scarab extends _$Scarab {
     switch (event) {
       case UpcomingEventsSyncEvent(:final events):
         state = state.copyWith(upcomingEvents: events);
+        break;
+      case SessionStartedEvent(:final session):
+        state = state.copyWith(activeSession: session);
+        break;
+      case SessionEndedEvent(:final session):
+        state = state.copyWith(
+          activeSession: null,
+          upcomingEvents: state.upcomingEvents
+              .where((e) => e.id != session.id)
+              .toList(),
+        );
         break;
     }
   }
@@ -130,7 +140,8 @@ List<Session> upcomingSessions(Ref ref) {
 }
 
 final activeSessionProvider = FutureProvider<Session?>((ref) async {
-  return await SessionService.getActiveSession();
+  final state = ref.watch(scarabProvider);
+  return state.activeSession;
 });
 
 final deviceAppsProvider = FutureProvider<Map<String, DeviceApplication>>((
