@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -195,16 +194,25 @@ class ChatInputState extends ConsumerState<ChatInput> {
   }
 
   void onSubmit(String text) {
-    if (text.trim().isEmpty) return;
+    final trimmedText = text.trim();
+    if (trimmedText.isEmpty) return;
 
-    var suggestion = _filteredSuggestions.firstWhereOrNull(
-      (suggestion) => text.contains(suggestion.activationKey()),
+    final matches = _filteredSuggestions.where(
+      (s) => trimmedText.contains(s.activationKey()),
     );
 
-    if (suggestion != null) {
-      suggestion.onSelect();
+    final bestMatch = matches.isEmpty
+        ? null
+        : matches.reduce(
+            (a, b) =>
+                a.activationKey().length > b.activationKey().length ? a : b,
+          );
+
+    // 3. Execute action
+    if (bestMatch != null) {
+      bestMatch.onSelect();
     } else {
-      widget.onSubmitted(text);
+      widget.onSubmitted(trimmedText);
     }
 
     widget.controller.clear();

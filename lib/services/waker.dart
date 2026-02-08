@@ -44,6 +44,7 @@ class WakerService {
     var now = DateTime.now();
     var nextDay = DateTime(now.year, now.month, now.day + 1);
     var durationUntilNextDay = nextDay.difference(now);
+    print("Nothing to do today, wake tommorow");
     await wake(delayUntil: durationUntilNextDay);
   }
 

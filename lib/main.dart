@@ -27,14 +27,11 @@ void main() async {
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // bool isDefault = await LauncherService.promptSetDefaultLauncher();
-
-  // if (isDefault) {
-  //   await ScarabBackendService.initialize();
-  // }
+  await LauncherService.promptSetDefaultLauncher();
+  await ScarabBackendService.initialize();
 
   runApp(ProviderScope(child: MyApp()));
-  // await ScarabBackendService.run();
+  await ScarabBackendService.run();
 }
 
 class MyApp extends StatelessWidget {
