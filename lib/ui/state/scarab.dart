@@ -95,6 +95,10 @@ class Scarab extends _$Scarab {
     }
   }
 
+  void clearHistory() {
+    state = state.copyWith(history: []);
+  }
+
   // Helper to clear chat
   void resetChat() {
     _session = _model.startChat();

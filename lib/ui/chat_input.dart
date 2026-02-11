@@ -72,7 +72,7 @@ class ChatInputState extends ConsumerState<ChatInput> {
   }
 
   List<Suggestion> _buildFullSuggestionList() {
-    List<Suggestion> suggestions = [AllSuggestions()];
+    List<Suggestion> suggestions = [AllSuggestions(), ClearChatSuggestion()];
 
     suggestions.addAll(appRoutes.map((route) => NavigationSuggestion(route)));
 
@@ -213,7 +213,7 @@ class ChatInputState extends ConsumerState<ChatInput> {
     if (_selectedSuggestion.isNotEmpty) {
       for (var suggestion in _selectedSuggestion) {
         trimmedText = trimmedText.replaceFirst(suggestion.activationKey(), "");
-        suggestion.onSelect(context);
+        suggestion.onSelect(context, ref);
       }
     }
 
@@ -263,7 +263,7 @@ abstract class Suggestion {
 
   Suggestion(this.id, this.title, this.subText);
 
-  void onSelect(BuildContext ctx);
+  void onSelect(BuildContext ctx, WidgetRef ref);
 
   bool matches(String text) {
     return title.toLowerCase().contains(text.toLowerCase()) ||
@@ -280,7 +280,7 @@ class AppSuggestion extends Suggestion {
   AppSuggestion(this.app) : super(app.packageId, app.name, app.packageId);
 
   @override
-  void onSelect(BuildContext _) {
+  void onSelect(BuildContext _, WidgetRef ref) {
     LaunchApp.openApp(androidPackageName: app.packageId);
   }
 
@@ -292,7 +292,7 @@ class AllSuggestions extends Suggestion {
   AllSuggestions() : super('all_suggestions', 'All Suggestions', '');
 
   @override
-  void onSelect(BuildContext _) {
+  void onSelect(BuildContext _, WidgetRef ref) {
     // Do nothing
   }
 }
@@ -304,10 +304,20 @@ class NavigationSuggestion extends Suggestion {
     : super(route.path, route.name, route.description);
 
   @override
-  void onSelect(BuildContext context) {
+  void onSelect(BuildContext context, WidgetRef ref) {
     Navigator.pushNamed(context, route.path);
   }
 
   @override
   String activationKey() => ":goto:${route.path}";
+}
+
+class ClearChatSuggestion extends Suggestion {
+  ClearChatSuggestion() : super('clear_chat', 'Clear Chat', '');
+
+  @override
+  void onSelect(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(scarabProvider.notifier);
+    notifier.clearHistory();
+  }
 }
