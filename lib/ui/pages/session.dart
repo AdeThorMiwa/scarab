@@ -60,6 +60,7 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
       startTime: _startTime,
       endTime: _endTime,
       allowedApps: _selectedAppIds,
+      isFocusSession: true,
     );
 
     await CalendarService.addEventToCalendar(req, calendarId: calendarId);

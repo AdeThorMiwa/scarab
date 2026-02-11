@@ -91,6 +91,7 @@ class GoogleCalendarEventRepository implements CalendarEventRepository {
         private: {
           "allowedApps": event.allowedApps.join(allowedAppsDelimiter),
           "isFreeTime": event.isFreeTime.toString(),
+          "isFocusSession": event.isFocusSession.toString(),
         },
       );
       e.visibility = "private";
@@ -122,6 +123,50 @@ class GoogleCalendarEventRepository implements CalendarEventRepository {
       return CalendarEvent.fromGoogleEvent(event);
     } catch (e) {
       return null;
+    }
+  }
+
+  @override
+  Future<void> update(
+    CalendarEvent event, {
+    String calendarId = 'primary',
+  }) async {
+    try {
+      final api = await _getCalendarApi();
+
+      var e = Event();
+      e.summary = event.title;
+      e.description = event.description;
+      e.start = EventDateTime(dateTime: event.startTime);
+      e.end = EventDateTime(dateTime: event.endTime);
+      e.colorId = "10";
+      e.transparency = event.isFreeTime ? "transparent" : "opaque";
+      e.extendedProperties = EventExtendedProperties(
+        private: {
+          "allowedApps": event.allowedApps.join(allowedAppsDelimiter),
+          "isFreeTime": event.isFreeTime.toString(),
+          "isFocusSession": event.isFocusSession.toString(),
+        },
+      );
+      e.visibility = "private";
+
+      await api.events.update(e, calendarId, event.id);
+    } on DetailedApiRequestError catch (e) {
+      print('API Error Status: ${e.status}');
+      print('API Error Message: ${e.message}');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> delete(String eventId, {String calendarId = 'primary'}) async {
+    try {
+      final api = await _getCalendarApi();
+      await api.events.delete(calendarId, eventId);
+    } on DetailedApiRequestError catch (e) {
+      print('API Error Status: ${e.status}');
+      print('API Error Message: ${e.message}');
+      rethrow;
     }
   }
 }

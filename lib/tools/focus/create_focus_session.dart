@@ -1,14 +1,13 @@
 import 'package:firebase_ai/firebase_ai.dart' as fbz;
 import 'package:scarab/models/calendar.dart';
 import 'package:scarab/services/calendar/service.dart';
-import 'package:scarab/services/launcher.dart';
+import 'package:scarab/tools/tool.dart';
 import 'package:scarab/utils/consts.dart';
-import 'interface.dart';
 
 class CreateFocusSessionTool extends Tool {
   CreateFocusSessionTool()
     : super(
-        'createFocusSession',
+        'create_focus_session',
         'Call this whenever you want to create a focus session. This will block distracting apps',
         {
           'title': fbz.Schema.string(
@@ -43,6 +42,7 @@ class CreateFocusSessionTool extends Tool {
       allowedApps: List<String>.from(
         (args["allowedApps"] as List<dynamic>?) ?? [],
       ),
+      isFocusSession: true,
     );
 
     print("Creating event with request: $req");
@@ -53,34 +53,5 @@ class CreateFocusSessionTool extends Tool {
     );
 
     return event.toMap();
-  }
-}
-
-class GetDeviceAppsTool extends Tool {
-  GetDeviceAppsTool()
-    : super(
-        'getDeviceApps',
-        'Call this to get a list of all apps on the device',
-        {},
-      );
-
-  @override
-  Future<List<Map<String, dynamic>>> execute(Map<String, dynamic> args) async {
-    var apps = await LauncherService.getDeviceApps();
-    return apps.map((app) => app.toMap()).toList();
-  }
-}
-
-class CurrentDateTimeTool extends Tool {
-  CurrentDateTimeTool()
-    : super(
-        'getCurrentDateTime',
-        'Call this to get the current date and time',
-        {},
-      );
-
-  @override
-  Future<String> execute(Map<String, dynamic> args) async {
-    return DateTime.now().toIso8601String();
   }
 }
