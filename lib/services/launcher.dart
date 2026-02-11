@@ -6,9 +6,11 @@ import 'package:permission_handler/permission_handler.dart';
 
 class LauncherService {
   static List<DeviceApplication>? _cachedApps;
+  static String? packageName;
 
   static Future<String> getPackageName() async {
-    return await PlayxHomeLauncher.getCurrentPackageName();
+    packageName ??= await PlayxHomeLauncher.getCurrentPackageName();
+    return packageName!;
   }
 
   static Future<bool> promptSetDefaultLauncher() async {
@@ -31,7 +33,9 @@ class LauncherService {
     return await PlayxHomeLauncher.isThisAppTheDefaultLauncher();
   }
 
-  static Future<List<DeviceApplication>> getDeviceApps() async {
+  static Future<List<DeviceApplication>> getDeviceApps({
+    bool excludeSelf = true,
+  }) async {
     // If we already have them, return immediately
     if (_cachedApps != null) return _cachedApps!;
 
@@ -40,6 +44,11 @@ class LauncherService {
       withIcon: false,
       excludeNonLaunchableApps: true,
     );
+
+    if (excludeSelf) {
+      var packageName = await getPackageName();
+      apps = apps.where((app) => app.packageName != packageName).toList();
+    }
 
     apps.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
