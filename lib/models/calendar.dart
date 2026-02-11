@@ -4,6 +4,7 @@ class AddEventToCalendarRequest {
   final DateTime startTime;
   final DateTime endTime;
   final List<String> allowedApps;
+  final bool isFocusSession;
 
   const AddEventToCalendarRequest({
     required this.title,
@@ -11,6 +12,7 @@ class AddEventToCalendarRequest {
     required this.startTime,
     required this.endTime,
     required this.allowedApps,
+    required this.isFocusSession,
   });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +22,7 @@ class AddEventToCalendarRequest {
       'startTime': startTime.millisecondsSinceEpoch,
       'endTime': endTime.millisecondsSinceEpoch,
       'allowedApps': allowedApps,
+      'isFocusSession': isFocusSession.toString(),
     };
   }
 }

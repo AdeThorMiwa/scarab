@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scarab/models/chat_message.dart';
+import 'package:scarab/ui/execution_log_sheet.dart';
 import 'state/scarab.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -11,6 +12,10 @@ class MessageArea extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final messages = ref.watch(chatMessagesProvider);
     final isThinking = ref.watch(scarabProvider.select((s) => s.isThinking));
+    final currentStatus = ref.watch(
+      scarabProvider.select((s) => s.currentStatus),
+    );
+    final logEntries = ref.watch(executionLogProvider);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
@@ -23,9 +28,15 @@ class MessageArea extends ConsumerWidget {
           border: Border.all(color: const Color(0xFF1A1E23)),
         ),
         child: Stack(
-          // Use a Stack to overlay the loader
           children: [
             _MessageList(messages: messages),
+            if (currentStatus != null)
+              Positioned(
+                bottom: 6,
+                left: 0,
+                right: 0,
+                child: _StatusIndicator(text: currentStatus),
+              ),
             if (isThinking)
               Positioned(
                 bottom: 0,
@@ -35,6 +46,14 @@ class MessageArea extends ConsumerWidget {
                   backgroundColor: Colors.transparent,
                   color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
                   minHeight: 2,
+                ),
+              ),
+            if (!isThinking && logEntries.isNotEmpty)
+              Positioned(
+                bottom: 4,
+                right: 0,
+                child: _LogButton(
+                  onTap: () => showExecutionLogSheet(context, logEntries),
                 ),
               ),
           ],
@@ -154,6 +173,54 @@ class _MessageBubble extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusIndicator extends StatelessWidget {
+  const _StatusIndicator({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: Text(
+        text,
+        key: ValueKey(text),
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Color(0xFF6A6F78),
+          fontSize: 12,
+          fontStyle: FontStyle.italic,
+        ),
+      ),
+    );
+  }
+}
+
+class _LogButton extends StatelessWidget {
+  const _LogButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1E23),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Icon(
+          Icons.receipt_long,
+          size: 16,
+          color: Color(0xFF6A6F78),
         ),
       ),
     );

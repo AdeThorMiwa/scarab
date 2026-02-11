@@ -40,7 +40,7 @@ final class ScarabProvider extends $NotifierProvider<Scarab, AppState> {
   }
 }
 
-String _$scarabHash() => r'9d26fe8fefb4e45dcde87af8a4569a601d62dcb0';
+String _$scarabHash() => r'31065aac1ae19b884203097646eab5957ccee262';
 
 abstract class _$Scarab extends $Notifier<AppState> {
   AppState build();
@@ -105,7 +105,7 @@ final class ChatMessagesProvider
   }
 }
 
-String _$chatMessagesHash() => r'd75409550336cb0d61c8db8006bb939b6d6f8fed';
+String _$chatMessagesHash() => r'13334f41652949a56f5b59bad670ae42d8351f5e';
 
 @ProviderFor(upcomingSessions)
 final upcomingSessionsProvider = UpcomingSessionsProvider._();
@@ -147,3 +147,50 @@ final class UpcomingSessionsProvider
 }
 
 String _$upcomingSessionsHash() => r'a51106e0a12634eece8ad27eabe3e8e2b26097d3';
+
+@ProviderFor(executionLog)
+final executionLogProvider = ExecutionLogProvider._();
+
+final class ExecutionLogProvider
+    extends
+        $FunctionalProvider<
+          List<ExecutionLogEntry>,
+          List<ExecutionLogEntry>,
+          List<ExecutionLogEntry>
+        >
+    with $Provider<List<ExecutionLogEntry>> {
+  ExecutionLogProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'executionLogProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$executionLogHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<ExecutionLogEntry>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  List<ExecutionLogEntry> create(Ref ref) {
+    return executionLog(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<ExecutionLogEntry> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<ExecutionLogEntry>>(value),
+    );
+  }
+}
+
+String _$executionLogHash() => r'5f8668e8ca82fd83c4ff54071816bb0bf29e549f';

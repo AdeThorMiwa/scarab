@@ -127,6 +127,7 @@ class SessionEnforcer extends TaskHandler {
         startTime: DateTime.fromMillisecondsSinceEpoch(input["startTime"]),
         endTime: DateTime.fromMillisecondsSinceEpoch(input["endTime"]),
         allowedApps: List<String>.from(input["allowedApps"] ?? []),
+        isFocusSession: true,
       );
 
       await CalendarService.addEventToCalendar(req);

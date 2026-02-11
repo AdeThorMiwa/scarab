@@ -11,4 +11,7 @@ abstract class CalendarEventRepository {
     DateTime to,
     int size = 1,
   });
+
+  Future<void> update(CalendarEvent event, {String calendarId});
+  Future<void> delete(String eventId, {String calendarId});
 }

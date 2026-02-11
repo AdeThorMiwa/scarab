@@ -5,6 +5,7 @@ class CalendarEvent {
   final String title;
   final String description;
   final bool isFreeTime;
+  final bool isFocusSession;
   final DateTime startTime;
   final DateTime endTime;
   final List<String> allowedApps;
@@ -17,6 +18,7 @@ class CalendarEvent {
     required this.endTime,
     required this.allowedApps,
     this.isFreeTime = true,
+    this.isFocusSession = false,
   });
 
   factory CalendarEvent.fromGoogleEvent(google_calender.Event event) {
@@ -26,6 +28,8 @@ class CalendarEvent {
     var privateProperties = event.extendedProperties?.private ?? {};
     var isFreeTime =
         bool.tryParse(privateProperties["isFreeTime"] ?? "false") ?? false;
+    var isFocusSession =
+        bool.tryParse(privateProperties["isFocusSession"] ?? "false") ?? false;
     List<String> allowedApps = (privateProperties["allowedApps"] ?? "").split(
       ",",
     );
@@ -41,6 +45,7 @@ class CalendarEvent {
       startTime: startTime,
       endTime: endTime,
       isFreeTime: isFreeTime,
+      isFocusSession: isFocusSession,
       allowedApps: allowedApps,
     );
   }
@@ -54,6 +59,7 @@ class CalendarEvent {
       'endTime': endTime.millisecondsSinceEpoch,
       'allowedApps': allowedApps,
       'isFreeTime': isFreeTime,
+      'isFocusSession': isFocusSession,
     };
   }
 
@@ -66,6 +72,7 @@ class CalendarEvent {
       endTime: DateTime.fromMillisecondsSinceEpoch(map['endTime'] as int),
       allowedApps: List<String>.from(map['allowedApps'] as List<dynamic>),
       isFreeTime: map['isFreeTime'] as bool,
+      isFocusSession: (map['isFocusSession'] as bool?) ?? false,
     );
   }
 }

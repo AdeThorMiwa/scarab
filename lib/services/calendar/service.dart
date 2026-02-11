@@ -45,6 +45,7 @@ class CalendarService {
       startTime: req.startTime,
       endTime: req.endTime,
       allowedApps: req.allowedApps,
+      isFocusSession: req.isFocusSession,
     );
 
     await _repository.save(evt, calendarId: calendarId);
@@ -70,5 +71,67 @@ class CalendarService {
       to: endOfDay,
       size: size,
     );
+  }
+
+  static Future<List<CalendarEvent>> getEventsInRange({
+    required DateTime from,
+    required DateTime to,
+    int size = 20,
+    String calendarId = "default",
+  }) async {
+    return await _repository.getEvents(
+      calendarId: calendarId,
+      from: from,
+      to: to,
+      size: size,
+    );
+  }
+
+  static Future<CalendarEvent> addGeneralEvent({
+    required String title,
+    required String description,
+    required DateTime startTime,
+    required DateTime endTime,
+    bool isFreeTime = false,
+    String calendarId = "default",
+  }) async {
+    var overlappingEvents = await _repository.getEvents(
+      calendarId: calendarId,
+      from: startTime,
+      to: endTime,
+    );
+
+    if (overlappingEvents.isNotEmpty) {
+      throw Exception("Time unavailable");
+    }
+
+    var id = generateHexString();
+
+    CalendarEvent evt = CalendarEvent(
+      id,
+      title: "[Scarab] - $title",
+      description: description,
+      startTime: startTime,
+      endTime: endTime,
+      allowedApps: [],
+      isFreeTime: isFreeTime,
+    );
+
+    await _repository.save(evt, calendarId: calendarId);
+    return evt;
+  }
+
+  static Future<void> updateEvent(
+    CalendarEvent event, {
+    String calendarId = "default",
+  }) async {
+    await _repository.update(event, calendarId: calendarId);
+  }
+
+  static Future<void> deleteEvent(
+    String eventId, {
+    String calendarId = "default",
+  }) async {
+    await _repository.delete(eventId, calendarId: calendarId);
   }
 }
